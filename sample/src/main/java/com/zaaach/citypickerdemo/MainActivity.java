@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import com.zaaach.citypicker.CityPicker;
 import com.zaaach.citypicker.adapter.OnPickListener;
+import com.zaaach.citypicker.db.DBManager;
 import com.zaaach.citypicker.model.City;
 import com.zaaach.citypicker.model.HotCity;
 import com.zaaach.citypicker.model.LocateState;
@@ -37,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Init();
         if (savedInstanceState != null) {
             theme = savedInstanceState.getInt(KEY);
             setTheme(theme > 0 ? theme : R.style.DefaultCityPickerTheme);
@@ -113,6 +114,14 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                         .show();
             }
         });
+    }
+
+    private void Init()
+    {
+        DBManager a= DBManager.GetDefault(this);
+        List<City> aa=new ArrayList<>();
+        aa.add(new City("郑州","01","a","410001"));
+        a.SetClfDb(aa);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.zaaach.citypicker.db;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -42,6 +43,32 @@ public class DBManager {
         copyDBFile();
     }
 
+    /**
+     * 静态实例
+     * @param context
+     * @return
+     */
+    public static  DBManager GetDefault(Context context)
+    {
+        return new DBManager(context);
+    }
+
+
+    public void SetClfDb(List<City> cities)
+    {
+        SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(DB_PATH +LATEST_DB_NAME, null);
+        db.delete(TABLE_NAME,null,null);
+        for (City item:cities) {
+            ContentValues values=new ContentValues();
+            values.put(COLUMN_C_NAME,item.getName());
+            values.put(COLUMN_C_CODE,item.getCode());
+            values.put(COLUMN_C_PINYIN,item.getPinyin());
+            values.put(COLUMN_C_PROVINCE,item.getProvince());
+            db.insert(TABLE_NAME,null,values);
+        }
+        db.close();
+    }
+
     private void copyDBFile(){
         File dir = new File(DB_PATH);
         if (!dir.exists()){
@@ -52,13 +79,22 @@ public class DBManager {
         if (dbV1.exists()){
             dbV1.delete();
         }
+        CreateDbFile(LATEST_DB_NAME);
+    }
+
+    /**
+     * 创建db文件
+     * @param dbName
+     */
+    private void CreateDbFile(String dbName)
+    {
         //创建新版本数据库
-        File dbFile = new File(DB_PATH + LATEST_DB_NAME);
+        File dbFile = new File(DB_PATH + dbName);
         if (!dbFile.exists()){
             InputStream is;
             OutputStream os;
             try {
-                is = mContext.getResources().getAssets().open(LATEST_DB_NAME);
+                is = mContext.getResources().getAssets().open(dbName);
                 os = new FileOutputStream(dbFile);
                 byte[] buffer = new byte[BUFFER_SIZE];
                 int length;
@@ -73,6 +109,7 @@ public class DBManager {
             }
         }
     }
+
 
     public List<City> getAllCities(){
         SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(DB_PATH + LATEST_DB_NAME, null);
